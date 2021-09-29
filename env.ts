@@ -1,0 +1,1 @@
+sprite="https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/#?sex=female&body=Humanlike_white&wound_arm=none&wound_brain=none&wound_ribs=none&eyes=Eyes_brown&facial=Facial_sunglasses&clothes=Tanktop_lavender&dress=none&legs=Armour_7&shoes=Shoes_brown&shadow=none&hair=Bangs_long_brown&necklace=Necklace_silver&shoulders=none"
