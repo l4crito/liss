@@ -3151,7 +3151,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 (0, _kaboom.default)({
   fullscreen: true,
-  clearColor: [255, 255, 255, 1]
+  clearColor: [0, 0, 0, 1]
 });
 },{"kaboom":"../node_modules/kaboom/dist/kaboom.mjs"}],"../../../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -3181,7 +3181,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33393" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45285" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
