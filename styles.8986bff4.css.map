@@ -1,0 +1,1 @@
+{"version":3,"sources":["styles.css"],"names":[],"mappings":"AAAA;AACA;AACA;AACA;AACA;AACA;AACA","file":"styles.8986bff4.css","sourceRoot":"../src","sourcesContent":[".bg {\n  background-color: black;\n  margin: 0;\n  padding: 0;\n  overflow: hidden;\n}\n"]}
