@@ -44,6 +44,7 @@ loadSpriteAtlas("sprites/liss-map.png", {
     },
   },
 });
+
 loadSpriteAtlas("sprites/shin.png", {
   shin: {
     x: 0,
@@ -58,12 +59,11 @@ loadSpriteAtlas("sprites/shin.png", {
   },
 });
 
+
 scene("game", () => {
   let playing = false;
-  let direction = "r";
-  let canChangeSprite = true;
+  let animation = "r";
   let score = 0;
-  // define gravity
   gravity(500);
 
   const healthbar = add([
@@ -108,7 +108,6 @@ scene("game", () => {
     scale(1.5),
   ]);
   player.play("jumpD", { loop: true });
-  // floor
   add([
     rect(width(), FLOOR_HEIGHT),
     outline(4),
@@ -117,15 +116,34 @@ scene("game", () => {
     area(),
     solid(),
     color(127, 200, 255),
-    cleanup(),
     "floor",
+  ]);
+  const wall = add([
+    rect(1, height()),
+    outline(0),
+    pos(-30, 0),
+    area(),
+    solid(),
+    "wall",
+  ]);
+  add([
+    rect(1, height()),
+    outline(0),
+    pos(width() + 10, 0),
+    area(),
+    solid(),
+    "wall",
   ]);
 
   function jump() {
     if (player.grounded()) {
-      if (direction == "l") {
+      if (animation == "walkL") {
         player.play("jumpL");
-      } else {
+      }
+      else if (animation == 'walkR') {
+        player.play("jumpR");
+      }
+      else if (player.frame == 263) {
         player.play("jumpR");
       }
       player.jump(JUMP_FORCE);
@@ -137,63 +155,74 @@ scene("game", () => {
   keyPress(["up", "space", "w"], jump);
   keyDown(["left", "a"], () => {
     player.move(-MOVE_SPEED, 0);
-    direction = "l";
     setSprite("walkL");
   });
 
   keyDown(["right", "d"], () => {
     player.move(MOVE_SPEED, 0);
-    direction = "r";
     setSprite("walkR");
   });
 
   mouseClick(jump);
 
-  function spawnSheen() {
+  function spawnShin() {
     if (playing) {
-      add([
+      const shin = add([
         area({ scale: 0.6 }),
         pos(width(), height() - FLOOR_HEIGHT * 3),
         origin("center"),
         move(LEFT, SPEED),
         sprite("shin", { anim: "ass" }),
-        scale(rand(0.5, 0.8)),
+        scale(rand(0.5, 0.9)),
         body(),
         "shin",
       ]);
+
     }
-    wait(rand(0.8, 1.5), spawnSheen);
+    wait(rand(0.8, 1.5), spawnShin);
   }
 
   // start spawning trees
-  spawnSheen();
+  spawnShin();
 
-  function setSprite(sprite = "walkR") {
-    if (!player.grounded()) {
+  function incrementScore() {
+    score++;
+    scoreLabel.text = "Culos mandados alv :" + score;
+    if(score>=30){
+      go("win");
+    }
+  }
+
+  function setSprite(anim = "walkR") {
+
+    if (anim == animation) {
       return;
     }
-    player.play(sprite);
+    animation = anim;
+    player.play(anim);
   }
 
   // lose if player collides with any game obj with tag "tree"
   player.collides("shin", (shin, position) => {
-    if (position !== "bottom") {
+    if (!position.isBottom()) {
       player.hurt(5);
       healthbar.set(player.hp());
-     
       shake();
       healthbar.flash = true;
       if (player.hp() <= 0) {
         go("lose");
       }
-      shin.destroy();
     }
+    shin.destroy();
+  });
+  wall.collides("shin", (shin) => {
+    incrementScore();
+    shin.destroy();
   });
 
   player.on("ground", (l) => {
     if (l.is("shin")) {
-      scoreLabel.text = "Culos mandados alv :" + score;
-      score++;
+      incrementScore();
       jump();
       destroy(l);
       addKaboom(player.pos);
@@ -201,8 +230,9 @@ scene("game", () => {
   });
 
   player.collides("floor", () => {
-    // player.stop();
     if (!playing) {
+      player.stop();
+      player.frame = 263;
       shake();
       playing = true;
       gravity(2000);
@@ -230,7 +260,32 @@ scene("lose", () => {
 
   // display score
   add([
-    text("perdiste mmv :c"),
+    text("perdiste lisbru :c"),
+    pos(width() / 2, height() / 2 + 80),
+    scale(1.5),
+    origin("center"),
+  ]);
+
+  // go back to game with space is pressed
+  keyPress("space", () => go("game"));
+
+  mouseClick(() => go("game"));
+  shake();
+});
+
+scene("win", () => {
+  add([
+    sprite("liss", {
+      frame: 1,
+    }),
+    pos(width() / 2, height() / 2 - 80),
+    scale(3),
+    origin("center"),
+  ]);
+
+  // display score
+  add([
+    text("perdiste lisbru :c"),
     pos(width() / 2, height() / 2 + 80),
     scale(1.5),
     origin("center"),
