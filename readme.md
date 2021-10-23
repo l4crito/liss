@@ -1,1 +1,3 @@
-First
+> [Liss sprite](https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/#?sex=female&body=Humanlike_white&wound_arm=none&wound_brain=none&wound_ribs=none&eyes=Eyes_brown&facial=Facial_sunglasses&clothes=Tanktop_lavender&dress=none&legs=Armour_7&shoes=Shoes_brown&shadow=none&hair=Bangs_long_brown&necklace=Necklace_silver&shoulders=none)
+
+>[Chris sprite](https://sanderfrenken.github.io/Universal-LPC-Spritesheet-Character-Generator/#?sex=male&body=Humanlike_light&wound_arm=none&wound_brain=none&wound_ribs=none&eyes=Eyes_brown&facial=Facial_glasses&clothes=Sleeved_black&dress=none&legs=Pantaloons_white&shoes=Shoes_black&shadow=none&hair=Idol_black&necklace=Necklace_silver&shoulders=none&beard=none&jacket=none&vest=none&ammo=none&weapon=none&earring=none&apron=none)
