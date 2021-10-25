@@ -5,18 +5,18 @@ const SPEED = 480;
 const HEALTH = 30;
 const MOVE_SPEED = 200;
 const BULLET_SPEED = 1200;
+const DESTROYED_CULOS = 10;
 
 
 // initialize context
-kaboom({
+export const k = kaboom({
   background: [255, 255, 255,],
 });
 debug.paused = false;
 // debug.inspect = true;
 
 // load assets
-
-loadSpriteAtlas("sprites/liss-map.png", {
+k.loadSpriteAtlas("sprites/liss-map.png", {
   liss: {
     x: 0,
     y: 0,
@@ -49,7 +49,7 @@ loadSpriteAtlas("sprites/liss-map.png", {
     },
   },
 });
-loadSpriteAtlas("sprites/chris-map.png", {
+k.loadSpriteAtlas("sprites/chris-map.png", {
   chris: {
     x: 0,
     y: 0,
@@ -82,8 +82,7 @@ loadSpriteAtlas("sprites/chris-map.png", {
     },
   },
 });
-
-loadSpriteAtlas("sprites/shin.png", {
+k.loadSpriteAtlas("sprites/shin.png", {
   shin: {
     x: 0,
     y: 0,
@@ -98,16 +97,6 @@ loadSpriteAtlas("sprites/shin.png", {
 });
 
 
-function grow(rate) {
-  return {
-    update() {
-      const n = rate * dt();
-      this.scale.x += n;
-      this.scale.y += n;
-    },
-  };
-}
-
 
 scene("game", () => {
   let playing = false;
@@ -115,20 +104,7 @@ scene("game", () => {
   let score = 0;
   gravity(500);
 
-  function spawnBullet(p) {
-    add([
-      rect(10, 10),
-      area(),
-      pos(p),
-      origin("center"),
-      color(127, 127, 255),
-      outline(4),
-      move(RIGHT, BULLET_SPEED),
-      cleanup(),
-      // strings here means a tag
-      "bullet",
-    ]);
-  }
+
 
 
   const healthbar = add([
@@ -220,19 +196,9 @@ scene("game", () => {
 
   function spawnShin() {
     if (playing) {
-      const shin = add([
-        area({ scale: 0.6 }),
-        pos(width(), height() - FLOOR_HEIGHT * 3),
-        origin("center"),
-        move(LEFT, SPEED),
-        sprite("shin", { anim: "ass" }),
-        scale(rand(0.5, 0.9)),
-        body(),
-        health(2),
-        "shin",
-      ]);
-      shin.on("hurt",()=>{
-        if(!shin.hp()){
+      const shin = createShin(randi(3, 7));
+      shin.on("hurt", () => {
+        if (shin.hp() <= 0) {
           addKaboom(shin.pos)
           destroy(shin);
           incrementScore();
@@ -248,7 +214,7 @@ scene("game", () => {
   function incrementScore() {
     score++;
     scoreLabel.text = "Culos mandados alv :" + score;
-    if (score >= 30) {
+    if (score >= DESTROYED_CULOS) {
       go("win");
     }
   }
@@ -307,29 +273,12 @@ scene("game", () => {
 
 
 
-  function addExplode(p, n, rad, size) {
-		for (let i = 0; i < n; i++) {
-			wait(rand(n * 0.1), () => {
-				for (let i = 0; i < 2; i++) {
-					add([
-						pos(p.add(rand(vec2(-rad), vec2(rad)))),
-						rect(4, 4),
-						outline(4),
-						scale(1 * size, 1 * size),
-						lifespan(0.1),
-						grow(rand(48, 72) * size),
-						origin("center"),
-					]);
-				}
-			});
-		}
-	}
 
   collides("bullet", "shin", (b, e) => {
-		destroy(b);
-		e.hurt(1);
-		addExplode(b.pos, 1, 13, 0.5);
-	});
+    destroy(b);
+    e.hurt(1);
+    addExplode(b.pos, 1, 13, 0.5);
+  });
 
   keyPress("enter", () => (debug.paused = !debug.paused));
   keyPress(["up", "w"], jump);
@@ -381,6 +330,37 @@ scene("win", () => {
   let chrisAdded = false;
   let lisPosition = 'r'
 
+  const messages = [
+    {
+      message: "Hola linda, que bonitas fotos tomas, pareces estudiada",
+      wait: 3.5
+    },
+    {
+      message: "Hola bonita, te doy haciendo la tesis perooo me pagas con besos",
+      wait: 3.5
+    },
+    {
+      message: "Muy linda la vista de abajo, solo falto yo encima",
+      wait: 3.5
+    },
+    {
+      message: "Hola perdida, parece que te has ido a otro pais por que ya ni escribes",
+      wait: 3.5
+    },
+    {
+      message: "Mira mi pack crees que tengo buen pito ?",
+      wait: 3.5
+    },
+  ]
+  const toAlv = [
+    "Come verga",
+    "Come pipi",
+    "Andate alv",
+    "Anda a mamar verga",
+    "Calla verga",
+  ];
+
+
   add([
     rect(width(), (height() / 2) - 80),
     pos(0, height()),
@@ -392,7 +372,15 @@ scene("win", () => {
   ]);
   add([
     rect(3, height()),
-    pos(width() / 2, 0),
+    pos(width() / 4, 0),
+    area(),
+    solid(),
+    color(255, 255, 255),
+    "wall",
+  ]);
+  add([
+    rect(3, height()),
+    pos(width() - (width() / 4), 0),
     area(),
     solid(),
     color(255, 255, 255),
@@ -408,6 +396,7 @@ scene("win", () => {
     "liss",
   ]);
 
+  const dialog = addDialog();
   liss.play("walkR", { loop: true });
 
   function addChris() {
@@ -432,7 +421,7 @@ scene("win", () => {
   liss.collides('wall', (m) => {
     lisPosition = 'm'
     liss.stop();
-    liss.frame = 260;
+    liss.frame = 151;
     spawnShin();
   });
   liss.action(() => {
@@ -442,42 +431,169 @@ scene("win", () => {
   });
 
 
-  let shinDestroyed = 0;
+  let shinsToSpawnChris = 0;
   function spawnShin() {
-    if (shinDestroyed >= 3) {
+    let bullettShoted = false;
+    if (shinsToSpawnChris >= messages.length) {
       addChris();
       return;
     }
 
-    const shin = add([
-      area({ width: 150, height: 40 }),
-      pos(width(), 0),
-      origin("center"),
-      move(LEFT, SPEED - 150),
-      sprite("shin", { anim: "ass" }),
-      scale(rand(0.5, 0.9)),
-      health(rand(3,5)),
-      body(),
-      "shin",
-    ]);
+    const shin = createShin(1, 0);
     shin.on('destroy', () => {
-      shinDestroyed++;
+      shinsToSpawnChris++;
       spawnShin();
     });
 
     shin.collides('wall', (l) => {
-      destroy(shin);
-      addKaboom(shin.pos);
-      liss.play('hitD');
+      if (!bullettShoted) {
+        liss.frame = 151;
+        bullettShoted = true;
+        dialog.say(messages[shinsToSpawnChris].message);
+        wait(messages[shinsToSpawnChris].wait, fire);
+      }
+
+
     });
+    shin.collides("bullet", (b) => {
+      b.destroy();
+      shin.destroy();
+      addKaboom(shin.pos)
+    });
+
+    function fire() {
+      dialog.dismiss();
+      liss.play('castR');
+      spawnWords(liss.pos, toAlv[k.randi(0,toAlv.length)]);
+    }
+
   }
-
-
-
-
-
 });
 
-go("game");
+go("win");
 
 
+
+export function spawnBullet(p) {
+  k.add([
+    k.rect(10, 10),
+    k.area(),
+    k.pos(p),
+    k.origin("center"),
+    k.color(127, 127, 255),
+    k.outline(4),
+    k.move(RIGHT, BULLET_SPEED),
+    k.cleanup(),
+    // strings here means a tag
+    "bullet",
+  ]);
+}
+
+export function spawnWords(p, text = 'Come verga') {
+  return k.add([
+    k.area(),
+    k.pos(p),
+    k.origin("botright"),
+    k.color(10, 10, 10),
+    k.move(RIGHT, 500),
+    k.cleanup(),
+    k.text(text, {
+      size: 25, // 48 pixels tall
+      // width: 320, // it'll wrap to next line when width exceeds this value
+      font: "apl386", // there're 4 built-in fonts: "apl386", "apl386o", "sink", and "sinko"
+    }),
+    // strings here means a tag
+    "bullet",
+  ]);
+}
+
+
+export function addExplode(p, n, rad, size) {
+  for (let i = 0; i < n; i++) {
+    k.wait(k.rand(n * 0.1), () => {
+      for (let i = 0; i < 2; i++) {
+        k.add([
+          k.pos(p.add(rand(vec2(-rad), vec2(rad)))),
+          k.rect(4, 4),
+          k.outline(4),
+          k.scale(1 * size, 1 * size),
+          k.lifespan(0.1),
+          grow(rand(48, 72) * size),
+          k.origin("center"),
+        ]);
+      }
+    });
+  }
+}
+
+export function grow(rate) {
+  return {
+    update() {
+      const n = rate * k.dt();
+      this.scale.x += n;
+      this.scale.y += n;
+    },
+  };
+}
+
+
+export function addDialog() {
+  const h = 160;
+  const pad = 16;
+  const bg = add([
+    k.pos(0, k.height() - h),
+    k.rect(k.width(), h),
+    k.color(0, 0, 0),
+    k.z(100),
+  ]);
+  const txt = add([
+    k.text("", {
+      width: k.width(),
+    }),
+    k.pos(0 + pad, k.height() - h + pad),
+    k.z(100),
+  ]);
+  bg.hidden = true;
+  txt.hidden = true;
+  return {
+    say(t) {
+      txt.text = t;
+      bg.hidden = false;
+      txt.hidden = false;
+    },
+    dismiss() {
+      if (!this.active()) {
+        return;
+      }
+      txt.text = "";
+      bg.hidden = true;
+      txt.hidden = true;
+    },
+    active() {
+      return !bg.hidden;
+    },
+    destroy() {
+      bg.destroy();
+      txt.destroy();
+    },
+  };
+}
+
+
+
+
+
+//characters
+export function createShin(hp = 7, y = k.height() - FLOOR_HEIGHT * 3) {
+  return k.add([
+    k.area({ scale: 0.6 }),
+    k.pos(k.width(), y),
+    k.origin("center"),
+    k.move(LEFT, SPEED),
+    k.sprite("shin", { anim: "ass" }),
+    k.scale(k.rand(0.5, 0.9)),
+    k.body(),
+    k.health(hp),
+    "shin",
+  ]);
+}
