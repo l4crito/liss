@@ -6,6 +6,8 @@ const HEALTH = 30;
 const MOVE_SPEED = 200;
 const BULLET_SPEED = 1200;
 const DESTROYED_CULOS = 10;
+const CHRIS = 'chris';
+const LISS = 'liss';
 
 
 // initialize context
@@ -102,7 +104,7 @@ scene("game", () => {
   let playing = false;
   let animation = "r";
   let score = 0;
-  gravity(500);
+  gravity(300);
 
 
 
@@ -139,14 +141,14 @@ scene("game", () => {
   // add a game object to screen
   const player = add([
     // list of components
-    sprite("liss"),
+    sprite(LISS),
     pos(200, 40),
     area({ scale: 0.9 }),
     body(),
     health(HEALTH),
-    "liss",
     origin("center"),
     scale(1.5),
+    LISS,
   ]);
   player.play("jumpD", { loop: true });
   add([
@@ -299,7 +301,7 @@ scene("game", () => {
 
 scene("lose", () => {
   add([
-    sprite("liss", {
+    sprite(LISS, {
       anim: "die",
     }),
     pos(width() / 2, height() / 2 - 80),
@@ -327,30 +329,45 @@ scene("lose", () => {
 
 
 scene("win", () => {
-  let chrisAdded = false;
   let lisPosition = 'r'
+  let chrisPosition = 'l'
+  let chrisSpawned = false
+  // gravity(300);
 
   const messages = [
+    // {
+    //   message: "Hola linda, que bonitas fotos tomas, pareces estudiada",
+    //   wait: 3.5
+    // },
+    // {
+    //   message: "Hola bonita, te doy haciendo la tesis perooo me pagas con besos",
+    //   wait: 3.5
+    // },
+    // {
+    //   message: "Muy linda la vista de abajo, solo falto yo encima",
+    //   wait: 3.5
+    // },
+    // {
+    //   message: "Hola perdida, parece que te has ido a otro pais por que ya ni escribes",
+    //   wait: 3.5
+    // },
+    // {
+    //   message: "Mira mi pack crees que tengo buen pito ?",
+    //   wait: 3.5
+    // },
+  ]
+  const chat = [
     {
-      message: "Hola linda, que bonitas fotos tomas, pareces estudiada",
-      wait: 3.5
+      message: "Hola sra, vamo a chumar :3",
+      wait: 2,
+      actor: CHRIS
     },
     {
-      message: "Hola bonita, te doy haciendo la tesis perooo me pagas con besos",
-      wait: 3.5
+      message: "<3",
+      wait: 1,
+      actor: LISS
     },
-    {
-      message: "Muy linda la vista de abajo, solo falto yo encima",
-      wait: 3.5
-    },
-    {
-      message: "Hola perdida, parece que te has ido a otro pais por que ya ni escribes",
-      wait: 3.5
-    },
-    {
-      message: "Mira mi pack crees que tengo buen pito ?",
-      wait: 3.5
-    },
+
   ]
   const toAlv = [
     "Come verga",
@@ -358,6 +375,7 @@ scene("win", () => {
     "Andate alv",
     "Anda a mamar verga",
     "Calla verga",
+    ".i.",
   ];
 
 
@@ -390,33 +408,63 @@ scene("win", () => {
     area({ scale: 0.5 }),
     pos(0, 0),
     origin("center"),
-    sprite("liss", { anim: "walkR" }),
+    sprite(LISS, { anim: "walkR" }),
     scale(2),
     body(),
-    "liss",
+    LISS,
   ]);
 
   const dialog = addDialog();
   liss.play("walkR", { loop: true });
 
   function addChris() {
-    if (chrisAdded) {
+    if (chrisSpawned) {
       return;
     }
-    chrisAdded = true;
+    chrisSpawned = true;
+
     const chris = add([
       area({ scale: 0.5 }),
       pos(width(), 0),
       origin("center"),
-      move(LEFT, 200),
-      sprite("chris", { anim: "walkR" }),
+      sprite(CHRIS, { anim: "walkR" }),
       scale(2),
       body(),
-      "chriss",
+      CHRIS,
 
     ]);
     chris.play("walkL", { loop: true });
+    chris.action(() => {
+      if (chris.grounded() && chrisPosition == 'l') {
+        chris.move(-250, 0);
+      }
+    });
+    chris.collides('wall', (m) => {
+      if(chrisPosition=='m'){
+        return;
+      }
+      chrisPosition = 'm'
+      chris.stop();
+      chris.frame = 125;
+      liss.frame = 151;
+      let w=0;
+     
+      chat.forEach(message=>{
+        const pos=message.actor == CHRIS ? chris.pos : {x:liss.pos.x+100,y:liss.pos.y};
+        wait(w,()=>{
+          showMessage(pos, message.message, message.actor == CHRIS ? LEFT : RIGHT,message.wait);
+        })
+        w+=message.wait;
+      })
+    });
   }
+
+
+  liss.action(() => {
+    if (liss.grounded() && lisPosition == 'r') {
+      liss.move(250, 0);
+    }
+  });
 
   liss.collides('wall', (m) => {
     lisPosition = 'm'
@@ -424,33 +472,27 @@ scene("win", () => {
     liss.frame = 151;
     spawnShin();
   });
-  liss.action(() => {
-    if (liss.grounded() && lisPosition == 'r') {
-      liss.move(250, 0);
-    }
-  });
 
 
-  let shinsToSpawnChris = 0;
   function spawnShin() {
     let bullettShoted = false;
-    if (shinsToSpawnChris >= messages.length) {
+    if (!messages.length) {
       addChris();
       return;
     }
 
     const shin = createShin(1, 0);
     shin.on('destroy', () => {
-      shinsToSpawnChris++;
-      spawnShin();
+      wait(1, spawnShin);
     });
 
     shin.collides('wall', (l) => {
       if (!bullettShoted) {
         liss.frame = 151;
         bullettShoted = true;
-        dialog.say(messages[shinsToSpawnChris].message);
-        wait(messages[shinsToSpawnChris].wait, fire);
+        const msg = messages.splice(Math.floor(Math.random() * messages.length), 1)[0];
+        dialog.say(msg.message);
+        wait(msg.wait, fire);
       }
 
 
@@ -458,16 +500,19 @@ scene("win", () => {
     shin.collides("bullet", (b) => {
       b.destroy();
       shin.destroy();
-      addKaboom(shin.pos)
+      addKaboom(b.pos)
+
     });
-
-    function fire() {
-      dialog.dismiss();
-      liss.play('castR');
-      spawnWords(liss.pos, toAlv[k.randi(0,toAlv.length)]);
-    }
-
   }
+  function fire() {
+    dialog.dismiss();
+    liss.play('castR');
+    wait(1, () => {
+      spawnWords(liss.pos, toAlv[k.randi(0, toAlv.length)]);
+    })
+  }
+
+
 });
 
 go("win");
@@ -490,7 +535,7 @@ export function spawnBullet(p) {
 }
 
 export function spawnWords(p, text = 'Come verga') {
-  return k.add([
+  k.add([
     k.area(),
     k.pos(p),
     k.origin("botright"),
@@ -505,6 +550,28 @@ export function spawnWords(p, text = 'Come verga') {
     // strings here means a tag
     "bullet",
   ]);
+}
+export function showMessage(p, text, dir = LEFT, lifespan = 2) {
+  const message = k.add([
+    k.area(),
+    k.pos(p),
+    k.origin("botright"),
+    k.color(10, 10, 10),
+    k.move(RIGHT, 500),
+    k.cleanup(),
+    k.lifespan(lifespan, { fade: 0.5 }),
+    k.move(dir, rand(60, 240)),
+    k.text(text, {
+      size: 25, // 48 pixels tall
+      // width: 320, // it'll wrap to next line when width exceeds this value
+      font: "apl386", // there're 4 built-in fonts: "apl386", "apl386o", "sink", and "sinko"
+    }),
+    k.body(),
+    // strings here means a tag
+    "bullet",
+  ]);
+  message.jump(k.rand(320, 640));
+
 }
 
 
