@@ -1,0 +1,19 @@
+.pc{
+    display: none;
+}
+@media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    .pc{
+        display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      font-size: 3rem;
+      background-color: black;
+      color: white;
+    }
+  }

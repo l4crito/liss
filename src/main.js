@@ -5,10 +5,12 @@ const SPEED = 480;
 const HEALTH = 30;
 const MOVE_SPEED = 200;
 const BULLET_SPEED = 1200;
-const DESTROYED_CULOS = 10;
 const CHRIS = 'chris';
 const LISS = 'liss';
 const SCENE = '...';
+const DESTROYED_CULOS = 25;
+const MAX_BULLETS = 30;
+let bullets = MAX_BULLETS;
 
 
 // initialize context
@@ -138,6 +140,34 @@ scene("game", () => {
       healthbar.color = rgb(127, 255, 127);
     }
   });
+  const bulletBar = add([
+    rect(width(), 24),
+    pos(0, 25),
+    color(138, 43, 226),
+    fixed(),
+    layer("ui"),
+    {
+      max: MAX_BULLETS,
+      set(hp) {
+        this.width = (width() * hp) / this.max;
+        this.flash = true;
+      },
+    },
+  ]);
+  bulletBar.action(() => {
+    if (bulletBar.flash) {
+      const t = time() * 40000000;
+      bulletBar.color.r = wave(127, 255, t);
+      bulletBar.color.g = wave(127, 255, t + 10);
+      bulletBar.color.b = wave(127, 255, t + 20);
+      bulletBar.opacity = 1;
+      bulletBar.color = rgb(255, 255, 255);
+      bulletBar.flash = false;
+    } else {
+      bulletBar.opacity = 1;
+      bulletBar.color = rgb(138, 43, 226);
+    }
+  });
 
   // add a game object to screen
   const player = add([
@@ -192,10 +222,21 @@ scene("game", () => {
     }
   }
 
+  function incrementBullets() {
+    if (bullets >= MAX_BULLETS) {
+      return;
+    }
+
+    bullets++;
+    bulletBar.set(bullets)
+  }
+
+
+
   // jump when user press space
 
 
-  mouseClick(jump);
+  mouseClick(fire);
 
   function spawnShin() {
     if (playing) {
@@ -205,6 +246,7 @@ scene("game", () => {
           addKaboom(shin.pos)
           destroy(shin);
           incrementScore();
+          incrementBullets();
         }
       });
     }
@@ -245,7 +287,7 @@ scene("game", () => {
     shin.destroy();
   });
   wall.collides("shin", (shin) => {
-    incrementScore();
+    // incrementScore()
     shin.destroy();
   });
 
@@ -270,12 +312,31 @@ scene("game", () => {
 
   const scoreLabel = add([
     text("culos mandados alv: 0"),
-    pos(24, 24),
+    pos(24, 60),
     scale(0.5),
+  ]);
+  add([
+    text("balas"),
+    pos(24, 24),
+    scale(0.4),
+  ]);
+  add([
+    text("vida"),
+    pos(24, 0),
+    scale(0.4),
   ]);
 
 
+function fire(){
+  if(!playing){ return;}
 
+  if (bullets <= 0) {
+    return;
+  }
+  bullets--;
+  bulletBar.set(bullets);
+  spawnBullet(player.pos)
+}
 
   collides("bullet", "shin", (b, e) => {
     destroy(b);
@@ -286,16 +347,23 @@ scene("game", () => {
   keyPress("enter", () => (debug.paused = !debug.paused));
   keyPress(["up", "w"], jump);
   keyPress(["space"], () => {
-    spawnBullet(player.pos)
+  fire();
   });
   keyDown(["left", "a"], () => {
+    if(!playing){ return;}
     player.move(-MOVE_SPEED, 0);
     setSprite("walkL");
   });
 
   keyDown(["right", "d"], () => {
+    if(!playing){ return;}
+
     player.move(MOVE_SPEED, 0);
     setSprite("walkR");
+  });
+
+  k.loop(2, () => {
+    incrementBullets();
   });
 
 });
@@ -323,6 +391,34 @@ scene("lose", () => {
 
   mouseClick(() => go("game"));
   shake();
+  const dialog = addDialog();
+  dialog.say("movimiento [w,a,s,d], saltar/empezar [espacio,click]")
+
+});
+
+scene("start", () => {
+  const liss = add([
+    sprite(LISS,),
+    pos(width() / 2, height() / 2 - 80),
+    scale(3),
+    origin("center"),
+  ]);
+  liss.frame = 26;
+
+  // display score
+  add([
+    text("Manda a la v a " + DESTROYED_CULOS + " culitos"),
+    pos(width() / 2, height() / 2 + 80),
+    scale(1.5),
+    origin("center"),
+  ]);
+
+  // go back to game with space is pressed
+  keyPress("space", () => go("game"));
+
+  mouseClick(() => go("game"));
+  const dialog = addDialog();
+  dialog.say("movimiento [w,a,s,d], saltar/empezar [espacio,click]")
 });
 
 
@@ -336,26 +432,34 @@ scene("win", () => {
   // gravity(300);
 
   const messages = [
-    // {
-    //   message: "Hola linda, que bonitas fotos tomas, pareces estudiada",
-    //   wait: 3.5
-    // },
-    // {
-    //   message: "Hola bonita, te doy haciendo la tesis perooo me pagas con besos",
-    //   wait: 3.5
-    // },
-    // {
-    //   message: "Muy linda la vista de abajo, solo falto yo encima",
-    //   wait: 3.5
-    // },
-    // {
-    //   message: "Hola perdida, parece que te has ido a otro pais por que ya ni escribes",
-    //   wait: 3.5
-    // },
-    // {
-    //   message: "Mira mi pack crees que tengo buen pito ?",
-    //   wait: 3.5
-    // },
+    {
+      message: "Hola linda, que bonitas fotos tomas, pareces estudiada",
+      wait: 3.5
+    },
+    {
+      message: "Hola bonita, te doy haciendo la tesis perooo me pagas con besos",
+      wait: 3.5
+    },
+    {
+      message: "Muy linda la vista de abajo, solo falto yo encima",
+      wait: 3.5
+    },
+    {
+      message: "Hola perdida, parece que te has ido a otro pais por que ya ni escribes",
+      wait: 3.5
+    },
+    {
+      message: "Mira mi pack crees que tengo buen pito ?",
+      wait: 3.5
+    },
+    {
+      message: "Mira tengo pelos en el rabo",
+      wait: 3.5
+    },
+    {
+      message: "Y si me das una mucha, pero no le digas a mi novia",
+      wait: 3.5
+    },
   ]
   const chat = [
     {
@@ -564,7 +668,9 @@ scene("win", () => {
     "Come verga",
     "Come pipi",
     "Andate alv",
-    "Anda a mamar verga",
+    "Andate alv",
+    "nel",
+    "Claro mija",
     "Calla verga",
     ".i.",
   ];
@@ -689,7 +795,7 @@ scene("win", () => {
 
     const shin = createShin(1, 0);
     shin.on('destroy', () => {
-      wait(1, spawnShin);
+      ; wait(1, spawnShin);
     });
 
     shin.collides('wall', (l) => {
@@ -721,7 +827,7 @@ scene("win", () => {
 
 });
 
-go("win");
+go("start");
 
 
 
@@ -731,7 +837,7 @@ export function spawnBullet(p) {
     k.area(),
     k.pos(p),
     k.origin("center"),
-    k.color(127, 127, 255),
+    k.color(138, 43, 226),
     k.outline(4),
     k.move(RIGHT, BULLET_SPEED),
     k.cleanup(),
@@ -872,8 +978,10 @@ export function addBigDialog() {
     k.text("", {
       width: k.width(),
     }),
-    k.pos(0 + pad, k.height() / 2 + pad),
     k.z(100),
+    k.pos(k.width() / 2, k.height() / 2 + 80),
+    k.origin("center")
+
   ]);
   bg.hidden = true;
   txt.hidden = true;
