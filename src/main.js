@@ -392,7 +392,7 @@ scene("lose", () => {
   mouseClick(() => go("game"));
   shake();
   const dialog = addDialog();
-  dialog.say("movimiento [w,a,s,d], saltar/empezar [espacio,click]")
+  dialog.say("movimiento [w,a,s,d], disparar/empezar [espacio,click]")
 
 });
 
@@ -418,7 +418,7 @@ scene("start", () => {
 
   mouseClick(() => go("game"));
   const dialog = addDialog();
-  dialog.say("movimiento [w,a,s,d], saltar/empezar [espacio,click]")
+  dialog.say("movimiento [w,a,s,d], disparar/empezar [espacio,click]")
 });
 
 
