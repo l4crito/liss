@@ -8,6 +8,7 @@ const BULLET_SPEED = 1200;
 const DESTROYED_CULOS = 10;
 const CHRIS = 'chris';
 const LISS = 'liss';
+const SCENE = '...';
 
 
 // initialize context
@@ -358,14 +359,204 @@ scene("win", () => {
   ]
   const chat = [
     {
-      message: "Hola sra, vamo a chumar :3",
+      message: "Holaa",
       wait: 2,
       actor: CHRIS
     },
     {
-      message: "<3",
+      message: "...",
       wait: 1,
       actor: LISS
+    },
+    {
+      message: "Hola",
+      wait: 6,
+      actor: LISS,
+      brain: "*Este mmv sigue vivo*"
+    },
+    {
+      message: "Quieres ir a shumar?",
+      wait: 3,
+      actor: CHRIS,
+
+    },
+    {
+      message: "naa, solo par bielas nomas",
+      wait: 5,
+      actor: LISS,
+      brain: "que se creera XD"
+
+    },
+    {
+      message: "De una psss",
+      wait: 3,
+      actor: CHRIS
+    },
+    {
+      message: "y los mmvs se vieron y pasiaron con par bielas",
+      wait: 6,
+      actor: SCENE
+    },
+    {
+      message: "Tiempo despues...",
+      wait: 3,
+      actor: SCENE
+    },
+    {
+      message: "Quieres ir a shumar again?",
+      wait: 3,
+      actor: CHRIS
+    },
+    {
+      message: "frescoo",
+      wait: 5,
+      actor: LISS,
+      brain: "este hp no se cansa ?? "
+    },
+    {
+      message: "y empezaron a shumar  y a shumar y a shumar como si no hubiera un tomorrow",
+      wait: 6,
+      actor: SCENE
+    },
+    {
+      message: "a veces comian",
+      wait: 4,
+      actor: SCENE
+    },
+    {
+      message: "a veces solo shumaban",
+      wait: 4,
+      actor: SCENE
+    },
+    {
+      message: "a veces comian y shumaban",
+      wait: 4,
+      actor: SCENE
+    },
+    {
+      message: "a veces se mandaban a la verga",
+      wait: 4,
+      actor: SCENE
+    },
+    {
+      message: "Chris sabia que liss tenia millon culos",
+      wait: 5,
+      actor: SCENE
+    },
+    {
+      message: "Liss sabia que Chris tenia 0 culos",
+      wait: 5,
+      actor: SCENE
+    },
+    {
+      message: "Ya ya par culos XD",
+      wait: 4,
+      actor: SCENE
+    },
+    {
+      message: "en fin, se llegaron a conocer mejor",
+      wait: 5,
+      actor: SCENE
+    },
+    {
+      message: "Creo que entendieron el porque de las cosas",
+      wait: 6,
+      actor: SCENE
+    },
+    {
+      message: "el porque se conocieron de cierta circunstancia",
+      wait: 5,
+      actor: SCENE
+    },
+    {
+      message: "el porque se volvieron a encontrar en otras circunstancias",
+      wait: 5,
+      actor: SCENE
+    },
+    {
+      message: "y creo que ambos se quieren",
+      wait: 6,
+      actor: SCENE
+    },
+    {
+      message: "Escuchame",
+      wait: 4,
+      actor: CHRIS
+    },
+    {
+      message: "La verdad es que me gusta demasiado pasar mi tiempo contigo",
+      wait: 7,
+      actor: CHRIS
+    },
+    {
+      message: "No se me ocurre nada que hacer el sabados si no es contigo",
+      wait: 7,
+      actor: CHRIS
+    },
+    {
+      message: "Cuando me dijiste aquella vez que me aleje fue la muerte",
+      wait: 7,
+      actor: CHRIS
+    },
+    {
+      message: "tengo muchisimo miedo ",
+      wait: 4,
+      actor: CHRIS
+    },
+    {
+      message: "estoy aterrado ",
+      wait: 4,
+      actor: CHRIS
+    },
+    {
+      message: "se por lo que pasaste",
+      wait: 4,
+      actor: CHRIS
+    },
+    {
+      message: "por eso mismo no se como actuar cuando estoy a tu lado ",
+      wait: 7,
+      actor: CHRIS
+    },
+    {
+      message: "no se si abrazarte",
+      wait: 5,
+      actor: CHRIS
+    },
+    {
+      message: "no se si te gusta que abrace",
+      wait: 5,
+      actor: CHRIS
+    },
+    {
+      message: "no se por que aun estamos hablando, si me pediste que me aleje esa vez ",
+      wait: 8,
+      actor: CHRIS
+    },
+    {
+      message: "soy pesimo redactor XD",
+      wait: 4,
+      actor: CHRIS
+    },
+    {
+      message: "el no saber nada es feo ",
+      wait: 5,
+      actor: CHRIS
+    },
+    {
+      message: "asi que",
+      wait: 3,
+      actor: CHRIS
+    },
+    {
+      message: "bueno creo que ya sabes para donde va esto ya basta de rodeos",
+      wait: 7,
+      actor: CHRIS
+    },
+    {
+      message: "Liss, quieres ser mi novia ?",
+      wait: 1000,
+      actor: SCENE
     },
 
   ]
@@ -415,6 +606,7 @@ scene("win", () => {
   ]);
 
   const dialog = addDialog();
+  const bigDialog = addBigDialog();
   liss.play("walkR", { loop: true });
 
   function addChris() {
@@ -440,21 +632,35 @@ scene("win", () => {
       }
     });
     chris.collides('wall', (m) => {
-      if(chrisPosition=='m'){
+      if (chrisPosition == 'm') {
         return;
       }
       chrisPosition = 'm'
       chris.stop();
       chris.frame = 125;
       liss.frame = 151;
-      let w=0;
-     
-      chat.forEach(message=>{
-        const pos=message.actor == CHRIS ? chris.pos : {x:liss.pos.x+100,y:liss.pos.y};
-        wait(w,()=>{
-          showMessage(pos, message.message, message.actor == CHRIS ? LEFT : RIGHT,message.wait);
+      let w = 0;
+
+      chat.forEach(message => {
+        const pos = message.actor == CHRIS ? { x: chris.pos.x - 100, y: chris.pos.y } : { x: liss.pos.x + 100, y: liss.pos.y };
+
+        wait(w, () => {
+
+          if (message.actor == SCENE) {
+            bigDialog.say(message.message, message.wait - .5);
+
+
+          } else {
+            bigDialog.dismiss();
+            if (message.brain) {
+              dialog.sayAndDismiss(message.actor + ": " + message.brain, message.wait);
+            }
+            showMessage(pos, message.message, message.actor == CHRIS ? LEFT : RIGHT, message.wait);
+          }
+
+
         })
-        w+=message.wait;
+        w += message.wait;
       })
     });
   }
@@ -555,15 +761,15 @@ export function showMessage(p, text, dir = LEFT, lifespan = 2) {
   const message = k.add([
     k.area(),
     k.pos(p),
-    k.origin("botright"),
+    k.origin("center"),
     k.color(10, 10, 10),
     k.move(RIGHT, 500),
     k.cleanup(),
     k.lifespan(lifespan, { fade: 0.5 }),
-    k.move(dir, rand(60, 240)),
+    k.move(dir, rand(60, 65)),
     k.text(text, {
       size: 25, // 48 pixels tall
-      // width: 320, // it'll wrap to next line when width exceeds this value
+      width: 320, // it'll wrap to next line when width exceeds this value
       font: "apl386", // there're 4 built-in fonts: "apl386", "apl386o", "sink", and "sinko"
     }),
     k.body(),
@@ -623,6 +829,63 @@ export function addDialog() {
   bg.hidden = true;
   txt.hidden = true;
   return {
+    sayAndDismiss(t, time) {
+      this.say(t);
+      k.wait(time, () => {
+        txt.text = "";
+        bg.hidden = true;
+        txt.hidden = true;
+      })
+    },
+    say(t) {
+      txt.text = t;
+      bg.hidden = false;
+      txt.hidden = false;
+    },
+    dismiss() {
+      if (!this.active()) {
+        return;
+      }
+      txt.text = "";
+      bg.hidden = true;
+      txt.hidden = true;
+    },
+    active() {
+      return !bg.hidden;
+    },
+    destroy() {
+      bg.destroy();
+      txt.destroy();
+    },
+  };
+}
+export function addBigDialog() {
+  const h = 160;
+  const pad = 16;
+  const bg = add([
+    k.pos(0, 0),
+    k.rect(k.width(), k.height()),
+    k.color(0, 0, 0),
+    k.z(100),
+  ]);
+  const txt = add([
+    k.text("", {
+      width: k.width(),
+    }),
+    k.pos(0 + pad, k.height() / 2 + pad),
+    k.z(100),
+  ]);
+  bg.hidden = true;
+  txt.hidden = true;
+  return {
+    sayAndDismiss(t, time) {
+      this.say(t);
+      k.wait(time, () => {
+        txt.text = "";
+        bg.hidden = true;
+        txt.hidden = true;
+      })
+    },
     say(t) {
       txt.text = t;
       bg.hidden = false;
